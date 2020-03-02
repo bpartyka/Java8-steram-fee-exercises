@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/klolo-javastream.iml" filepath="$PROJECT_DIR$/.idea/modules/klolo-javastream.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/klolo-javastream_main.iml" filepath="$PROJECT_DIR$/.idea/modules/klolo-javastream_main.iml" group="klolo-javastream" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/klolo-javastream_test.iml" filepath="$PROJECT_DIR$/.idea/modules/klolo-javastream_test.iml" group="klolo-javastream" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java8-stream-free-exercises.iml" filepath="$PROJECT_DIR$/.idea/modules/java8-stream-free-exercises.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java8-stream-free-exercises_main.iml" filepath="$PROJECT_DIR$/.idea/modules/java8-stream-free-exercises_main.iml" group="java8-stream-free-exercises" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java8-stream-free-exercises_test.iml" filepath="$PROJECT_DIR$/.idea/modules/java8-stream-free-exercises_test.iml" group="java8-stream-free-exercises" />
     </modules>
   </component>
 </project>

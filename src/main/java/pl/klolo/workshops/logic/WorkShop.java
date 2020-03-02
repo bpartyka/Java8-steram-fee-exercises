@@ -1,29 +1,21 @@
 package pl.klolo.workshops.logic;
 
-import pl.klolo.workshops.domain.*;
 import pl.klolo.workshops.domain.Currency;
+import pl.klolo.workshops.domain.*;
 import pl.klolo.workshops.mock.HoldingMockGenerator;
-import pl.klolo.workshops.mock.UserMockGenerator;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.*;
-import static java.util.stream.Collectors.toSet;
+import static java.math.BigDecimal.valueOf;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 class WorkShop {
     /**
@@ -43,206 +35,224 @@ class WorkShop {
      * Metoda zwraca liczbę holdingów w których jest przynajmniej jedna firma.
      */
     long getHoldingsWhereAreCompanies() {
-        return holdings.stream()
-                .filter(holding -> holding.getCompanies().size() > 0)
-                .count();
+        return holdings.stream().filter(x -> x.getCompanies().size() >= 1).count();
+
     }
 
-    /**
-     * Zwraca nazwy wszystkich holdingów pisane z małej litery w formie listy.
-     */
+    //    /**
+//     * Zwraca nazwy wszystkich holdingów pisane z małej litery w formie listy.
+//     */
     List<String> getHoldingNames() {
         return holdings.stream()
-                .map(holding -> holding.getName().toLowerCase())
-                .collect(Collectors.toList());
+                .map(x -> x.getName().toLowerCase())
+                .collect(toList());
     }
 
-    /**
-     * Zwraca nazwy wszystkich holdingów sklejone w jeden string i posortowane.
-     * String ma postać: (Coca-Cola, Nestle, Pepsico)
-     */
+    //
+//    /**
+//     * Zwraca nazwy wszystkich holdingów sklejone w jeden string i posortowane.
+//     * String ma postać: (Coca-Cola, Nestle, Pepsico)
+//     */
     String getHoldingNamesAsString() {
-        return holdings.stream()
-                .map(Holding::getName)
-                .sorted()
-                .collect(Collectors.joining(", ", "(", ")"));
+        return holdings.stream().map(x -> x.getName()).sorted()
+                .collect(toList())
+                .toString().replace("[", "(")
+                .replace("]", ")");
+
     }
 
-    /**
-     * Zwraca liczbę firm we wszystkich holdingach.
-     */
+    //    /**
+//     * Zwraca liczbę firm we wszystkich holdingach.
+//     */
     long getCompaniesAmount() {
+
         return holdings.stream()
-                .mapToInt(holding -> holding.getCompanies().size())
+                .mapToInt(x -> x.getCompanies().size())
                 .sum();
     }
 
-    /**
-     * Zwraca liczbę wszystkich pracowników we wszystkich firmach.
-     */
+    //
+//    /**
+//     * Zwraca liczbę wszystkich pracowników we wszystkich firmach.
+//     */
     long getAllUserAmount() {
         return holdings.stream()
-                .flatMap(holding -> holding.getCompanies().stream())
-                .mapToLong(company -> company.getUsers().size())
-                .sum();
-    }
+                .flatMap(x->x.getCompanies().stream())
+                .flatMap(y->y.getUsers().stream())
+                .count();
 
-    /**
-     * Zwraca listę wszystkich nazw firm w formie listy. Tworzenie strumienia firm umieść w osobnej metodzie którą
-     * później będziesz wykorzystywać.
-     */
+
+
+    }
+//
+//    /**
+//     * Zwraca listę wszystkich nazw firm w formie listy.
+//     Tworzenie strumienia firm umieść w osobnej metodzie którą
+//     * później będziesz wykorzystywać.
+//     */
     List<String> getAllCompaniesNames() {
-        return getCompanyStream()
-                .map(Company::getName)
-                .collect(Collectors.toList());
+        return holdings.stream().flatMap(x->x.getCompanies().stream())
+                .map(y->y.getName()).collect(toList());
     }
-
-    /**
-     * Zwraca listę wszystkich firm jako listę, której implementacja to LinkedList. Obiektów nie przepisujemy
-     * po zakończeniu działania strumienia.
-     */
+//
+//    /**
+//     * Zwraca listę wszystkich firm jako listę, której implementacja to LinkedList.
+//     Obiektów nie przepisujemy
+//     * po zakończeniu działania strumienia.
+//     */
     LinkedList<String> getAllCompaniesNamesAsLinkedList() {
-        return getCompanyStream()
-                .map(Company::getName)
+
+        return holdings.stream().flatMap(x->x.getCompanies().stream())
+                .map(y->y.getName())
                 .collect(Collectors.toCollection(LinkedList::new));
-    }
 
-    /**
-     * Zwraca listę firm jako String gdzie poszczególne firmy są oddzielone od siebie znakiem "+"
-     */
+    }
+//
+//    /**
+//     * Zwraca listę firm jako String gdzie poszczególne firmy są oddzielone od siebie znakiem "+"
+//     */
     String getAllCompaniesNamesAsString() {
-        return getCompanyStream()
-                .map(Company::getName)
-                .collect(Collectors.joining("+"));
+return  holdings.stream().flatMap(x->x.getCompanies().stream())
+        .map(y->y.getName())
+        .collect(Collectors.joining("+"));
     }
+//
+//    /**
+//     * Zwraca listę firm jako string gdzie poszczególne firmy są oddzielone od siebie znakiem "+".
+//     * Używamy collect i StringBuilder.
+//     * <p>
+//     * UWAGA: Zadanie z gwiazdką. Nie używamy zmiennych.
+//     */
+//    String getAllCompaniesNamesAsStringUsingStringBuilder() {
+//            holdings.stream().flatMap(z->z.getCompanies().stream())
+//                    .collect(Collector.of(StringBuilder::new, ))
+//
+//    }
 
-    /**
-     * Zwraca listę firm jako string gdzie poszczególne firmy są oddzielone od siebie znakiem "+".
-     * Używamy collect i StringBuilder.
-     * <p>
-     * UWAGA: Zadanie z gwiazdką. Nie używamy zmiennych.
-     */
-    String getAllCompaniesNamesAsStringUsingStringBuilder() {
-        AtomicBoolean first = new AtomicBoolean(false);
-        return getCompanyStream()
-                .map(Company::getName)
-                .collect(Collector.of(StringBuilder::new,
-                        (stringBuilder, s) -> {
-                            if (first.getAndSet(true)) stringBuilder.append("+");
-                            stringBuilder.append(s);
-                        },
-                        StringBuilder::append,
-                        StringBuilder::toString));
-    }
-
-    /**
-     * Zwraca liczbę wszystkich rachunków, użytkowników we wszystkich firmach.
-     */
+//    /**
+//     * Zwraca liczbę wszystkich rachunków, użytkowników we wszystkich firmach.
+//     */
     long getAllUserAccountsAmount() {
-        return getCompanyStream()
-                .flatMap(company -> company.getUsers().stream())
-                .mapToInt(user -> user.getAccounts().size())
-                .sum();
+      return holdings.stream().flatMap(x->x.getCompanies().stream())
+              .flatMap(y->y.getUsers().stream())
+              .mapToInt(z->z.getAccounts().size()).sum();
     }
-
-    /**
-     * Zwraca listę wszystkich walut w jakich są rachunki jako string, w którym wartości
-     * występują bez powtórzeń i są posortowane.
-     */
+//
+//    /**
+//     * Zwraca listę wszystkich walut w jakich są rachunki jako string, w którym wartości
+//     * występują bez powtórzeń i są posortowane.
+//     */
     String getAllCurrencies() {
-        final List<String> currencies = getAllCurrenciesToListAsString();
-
-        return currencies
-                .stream()
-                .distinct()
-                .sorted()
-                .collect(Collectors.joining(", "));
+            return holdings.stream().flatMap(x->x.getCompanies().stream())
+            .flatMap(y->y.getUsers().stream())
+            .flatMap(z->z.getAccounts().stream())
+            .map(u->u.getCurrency())
+                    .map(xx-> Objects.toString( xx, null))
+                            .sorted().distinct().collect(Collectors.joining(", "));
     }
+//
+//    /**
+//     * Metoda zwraca analogiczne dane jak getAllCurrencies, jednak na utworzonym zbiorze
+//     nie uruchamiaj metody
+//     * stream, tylko skorzystaj z  Stream.generate. Wspólny kod wynieś do osobnej metody.
+//     *
+//     * @see #getAllCurrencies()
+//     */
+List<String> getAllCurrenciesLista() {
+    return holdings.stream().flatMap(x -> x.getCompanies().stream())
+            .flatMap(y -> y.getUsers().stream())
+            .flatMap(z -> z.getAccounts().stream())
+            .map(u -> u.getCurrency()).map(xx->Objects.toString(xx, null))
+            .collect(toList());
 
-    /**
-     * Metoda zwraca analogiczne dane jak getAllCurrencies, jednak na utworzonym zbiorze nie uruchamiaj metody
-     * stream, tylko skorzystaj z  Stream.generate. Wspólny kod wynieś do osobnej metody.
-     *
-     * @see #getAllCurrencies()
-     */
+
+}
     String getAllCurrenciesUsingGenerate() {
-        final List<String> currencies = getAllCurrenciesToListAsString();
+        List<String> list = getAllCurrenciesLista();
+        return Stream.generate(list.iterator()::next)
+                .limit(list.size())
+                .sorted().distinct()
+                .collect(joining(", "));
 
-        return Stream.generate(currencies.iterator()::next)
-                .limit(currencies.size())
-                .distinct()
-                .sorted()
-                .collect(Collectors.joining(", "));
-    }
 
-    private List<String> getAllCurrenciesToListAsString() {
-        return getCompanyStream()
-                .flatMap(company -> company.getUsers().stream())
-                .flatMap(user -> user.getAccounts().stream())
-                .map(Account::getCurrency)
-                .map(c -> Objects.toString(c, null))
-                .collect(Collectors.toList());
     }
+//
 
     /**
-     * Zwraca liczbę kobiet we wszystkich firmach. Powtarzający się fragment kodu tworzący strumień użytkowników umieść
-     * w osobnej metodzie. Predicate określający czy mamy do czynienia z kobietą niech będzie polem statycznym w klasie.
+     * Zwraca liczbę kobiet we wszystkich firmach. Powtarzający się fragment
+     * kodu tworzący strumień użytkowników umieść
+     * w osobnej metodzie. Predicate określający czy mamy do czynienia
+     * z kobietą niech będzie polem statycznym w klasie.
      */
     long getWomanAmount() {
-        return getUserStream()
-                .filter(isWoman)
+        return holdings.stream().flatMap(x->x.getCompanies().stream())
+                .flatMap(y-> y.getUsers().stream())
+                .filter(z->z.getSex().equals(Sex.WOMAN))
                 .count();
     }
-
-
+//
+//
     /**
      * Przelicza kwotę na rachunku na złotówki za pomocą kursu określonego w enum Currency.
      */
     BigDecimal getAccountAmountInPLN(final Account account) {
-        return account
-                .getAmount()
-                .multiply(BigDecimal.valueOf(account.getCurrency().rate))
+        return account.getAmount()
+                .multiply(valueOf(account.getCurrency().rate))
                 .round(new MathContext(4, RoundingMode.HALF_UP));
+
+
+
     }
 
     /**
-     * Przelicza kwotę na podanych rachunkach na złotówki za pomocą kursu określonego w enum Currency i sumuje ją.
+     * Przelicza kwotę na podanych rachunkach na złotówki
+     * za pomocą kursu określonego w enum Currency i sumuje ją.
      */
     BigDecimal getTotalCashInPLN(final List<Account> accounts) {
-        return accounts
-                .stream()
-                .map(account -> account.getAmount().multiply(BigDecimal.valueOf(account.getCurrency().rate)))
+        return accounts.stream()
+                .map(z->z.getAmount().multiply(valueOf(z.getCurrency().rate)))
                 .reduce(BigDecimal.valueOf(0), BigDecimal::add);
-    }
 
+
+
+
+    }
+//
     /**
      * Zwraca imiona użytkowników w formie zbioru, którzy spełniają podany warunek.
      */
     Set<String> getUsersForPredicate(final Predicate<User> userPredicate) {
-        return getUserStream()
-                .filter(userPredicate)
-                .map(User::getFirstName)
-                .collect(Collectors.toSet());
-    }
 
+        return  holdings.stream().flatMap(x->x.getCompanies().stream())
+                .flatMap(y->y.getUsers().stream())
+                .filter(userPredicate)
+                .map(zz->zz.getFirstName())
+                .collect(Collectors.toSet());
+
+    }
+//
     /**
-     * Metoda filtruje użytkowników starszych niż podany jako parametr wiek, wyświetla ich na konsoli, odrzuca mężczyzn
+     * Metoda filtruje użytkowników starszych niż podany jako parametr wiek,
+     * wyświetla ich na konsoli, odrzuca mężczyzn
      * i zwraca ich imiona w formie listy.
      */
     List<String> getOldWoman(final int age) {
-        return getUserStream()
-                .filter(user -> user.getAge() > age)
-                .peek(System.out::println)
-                .filter(isMan)
-                .map(User::getFirstName)
-                .collect(Collectors.toList());
-    }
+            return holdings.stream().flatMap(x->x.getCompanies().stream())
+                    .flatMap(y->y.getUsers().stream())
+                    .filter(w->w.getAge()> age )
+                    .peek(System.out::println)
+                    .filter(y->y.getSex().equals(Sex.MAN))
+                    .map(y->y.getFirstName())
+                    .collect(toList());
 
+    }
+//
     /**
      * Dla każdej firmy uruchamia przekazaną metodę.
      */
     void executeForEachCompany(final Consumer<Company> consumer) {
-        getCompanyStream().forEach(consumer);
+        holdings.stream().flatMap(x->x.getCompanies().stream())
+            .forEach(consumer);
     }
 
     /**
@@ -250,9 +260,7 @@ class WorkShop {
      */
     //pomoc w rozwiązaniu problemu w zadaniu: https://stackoverflow.com/a/55052733/9360524
     Optional<User> getRichestWoman() {
-        return getUserStream()
-                .filter(user -> user.getSex().equals(Sex.WOMAN))
-                .max(Comparator.comparing(this::getUserAmountInPLN));
+
     }
 
     private BigDecimal getUserAmountInPLN(final User user) {
@@ -266,26 +274,29 @@ class WorkShop {
      * Zwraca nazwy pierwszych N firm. Kolejność nie ma znaczenia.
      */
     Set<String> getFirstNCompany(final int n) {
-        return getCompanyStream()
-                .limit(n)
-                .map(Company::getName)
-                .collect(Collectors.toSet());
+            return  holdings.stream().flatMap(x->x.getCompanies().stream())
+                    .limit(n)
+                    .map(y->y.getName()).collect(Collectors.toSet());
     }
-
+//
     /**
-     * Metoda zwraca jaki rodzaj rachunku jest najpopularniejszy. Stwórz pomocniczą metodę getAccountStream.
-     * Jeżeli nie udało się znaleźć najpopularniejszego rachunku metoda ma wyrzucić wyjątek IllegalStateException.
+     * Metoda zwraca jaki rodzaj rachunku jest najpopularniejszy.
+     * Stwórz pomocniczą metodę getAccountStream.
+     * Jeżeli nie udało się znaleźć najpopularniejszego rachunku
+     * metoda ma wyrzucić wyjątek IllegalStateException.
      * Pierwsza instrukcja metody to return.
      */
+    List<Account> getAccountStream () {
+        return holdings.stream().flatMap(x->x.getCompanies().stream())
+                .flatMap(x->x.getUsers().stream())
+                .flatMap(y->y.getAccounts().stream())
+                .collect(Collectors.toList());
+    }
     AccountType getMostPopularAccountType() {
-        return getAccoutStream()
-                .map(Account::getType)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .entrySet()
-                .stream()
-                .max(Comparator.comparing(Map.Entry::getValue))
-                .map(Map.Entry::getKey)
-                .orElseThrow(IllegalStateException::new);
+        List<Account> list = getAccountStream();
+        return list.stream()
+                .map(x->x.getType())
+                .sorted().findFirst().get();
     }
 
     /**
@@ -419,9 +430,6 @@ class WorkShop {
      * Zosia Psikuta, Zenon Kucowski, Zenek Jawowy ... Alfred Pasibrzuch, Adam Wojcik
      */
     void showAllUser() {
-        getUserStream()
-                .sorted(Comparator.comparing(User::getFirstName).reversed())
-                .forEach(System.out::println);
     }
 
     /**
@@ -443,9 +451,6 @@ class WorkShop {
      * Zwraca sumę kwadratów wieków wszystkich użytkowników.
      */
     int getAgeSquaresSum() {
-        return getUserStream()
-                .mapToInt(User::getAge)
-                .map(p -> (int) Math.pow(p, 2)).sum();
     }
 
     /**
@@ -454,50 +459,30 @@ class WorkShop {
      * wyrzucić wyjątek (bez zmiany sygnatury metody).
      */
     List<User> getRandomUsers(final int n) {
-        final UserMockGenerator userMockGenerator = new UserMockGenerator();
-
-        return Optional.of(userMockGenerator.generate().stream()
-                .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
-                    Collections.shuffle(collected);
-                    return collected.stream();
-                }))
-                .limit(n)
-                .distinct()
-                .collect(Collectors.toList()))
-                .orElseThrow(ArrayIndexOutOfBoundsException::new);
     }
 
     /**
      * Zwraca strumień wszystkich firm.
      */
     private Stream<Company> getCompanyStream() {
-        return holdings.stream()
-                .flatMap(holding -> holding.getCompanies().stream());
     }
 
     /**
      * Zwraca zbiór walut w jakich są rachunki.
      */
     private Set<Currency> getCurenciesSet() {
-        return getAccoutStream()
-                .map(Account::getCurrency)
-                .collect(Collectors.toSet());
     }
 
     /**
      * Tworzy strumień rachunków.
      */
     private Stream<Account> getAccoutStream() {
-        return getUserStream()
-                .flatMap(user -> user.getAccounts().stream());
     }
 
     /**
      * Tworzy strumień użytkowników.
      */
     private Stream<User> getUserStream() {
-        return getCompanyStream()
-                .flatMap(company -> company.getUsers().stream());
     }
 
     /**
@@ -508,44 +493,18 @@ class WorkShop {
     //TODO: zamiast Map<Stream<AccountType>, Map<User, BigDecimal>> metoda ma zwracać
     // Map<AccountType>, Map<User, BigDecimal>>, zweryfikować działania metody
     Map<Stream<AccountType>, Map<User, BigDecimal>> getMapWithAccountTypeKeyAndSumMoneyForManInPLN() {
-        return getCompanyStream()
-                .collect(Collectors.toMap(
-                        company -> company.getUsers()
-                                .stream()
-                                .flatMap(user -> user.getAccounts()
-                                        .stream()
-                                        .map(Account::getType)),
-                        this::manWithSumMoneyOnAccounts
-                ));
     }
 
     private Map<User, BigDecimal> manWithSumMoneyOnAccounts(final Company company) {
-        return company
-                .getUsers()
-                .stream()
-                .filter(isMan)
-                .collect(Collectors.toMap(
-                        Function.identity(),
-                        this::getSumUserAmountInPLN
-                ));
     }
 
     private BigDecimal getSumUserAmountInPLN(final User user) {
-        return user.getAccounts()
-                .stream()
-                .map(this::getAccountAmountInPLN)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /**
      * 39. Policz ile pieniędzy w złotówkach jest na kontach osób które nie są ani kobietą ani mężczyzną.
      */
     BigDecimal getSumMoneyOnAccountsForPeopleOtherInPLN() {
-        return getUserStream()
-                .filter(user -> user.getSex().equals(Sex.OTHER))
-                .map(this::getUserAmountInPLN)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .round(MathContext.DECIMAL32);
     }
 
     /**
@@ -555,9 +514,5 @@ class WorkShop {
      * która ma więcej lub równo 18 lat
      */
     Map<Boolean, Long> divideIntoAdultsAndNonAdults() {
-        Predicate<User> ofAge = u -> u.getAge() >= 18;
-
-        return getUserStream()
-                .collect(Collectors.partitioningBy(ofAge, Collectors.counting()));
     }
 }

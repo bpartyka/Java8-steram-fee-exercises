@@ -8,11 +8,11 @@ import pl.klolo.workshops.domain.Currency;
 import pl.klolo.workshops.domain.User;
 
 import java.math.BigDecimal;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class WorkShopTest {
@@ -41,28 +41,28 @@ public class WorkShopTest {
         final List<String> holdingNames = workShop.getHoldingNames();
         assertEquals("[nestle, coca-cola, pepsico]", holdingNames.toString());
     }
-
-    /**
-     * 3.
-     */
+//
+//    /**
+//     * 3.
+//     */
     @Test
     public void shouldReturnNamesOfAllHoldingInString() {
         final String holdingNames = workShop.getHoldingNamesAsString();
         assertEquals("(Coca-Cola, Nestle, Pepsico)", holdingNames);
     }
 
-    /**
-     * 4.
-     */
+//    /**
+//     * 4.
+//     */
     @Test
     public void shouldCountCompaniesInHoldings() {
         final long companiesAmount = workShop.getCompaniesAmount();
         assertEquals(8, companiesAmount);
     }
-
-    /**
-     * 5.
-     */
+//
+//    /**
+//     * 5.
+//     */
     @Test
     public void shouldCountAllUsersInAllCompanies() {
         final long userAmount = workShop.getAllUserAmount();
@@ -91,15 +91,15 @@ public class WorkShopTest {
     /**
      * 8.
      */
-    @Test
-    public void shouldReturnAllCompaniesNameAsStringUsingStringBuilder() {
-        final String allCompaniesName = workShop.getAllCompaniesNamesAsStringUsingStringBuilder();
-        assertEquals("Nescafe+Gerber+Nestea+Fanta+Sprite+Lays+Pepsi+Mirinda", allCompaniesName);
-    }
-
-    /**
-     * 9.
-     */
+//    @Test
+//    public void shouldReturnAllCompaniesNameAsStringUsingStringBuilder() {
+//        final String allCompaniesName = workShop.getAllCompaniesNamesAsStringUsingStringBuilder();
+//        assertEquals("Nescafe+Gerber+Nestea+Fanta+Sprite+Lays+Pepsi+Mirinda", allCompaniesName);
+//    }
+//
+//    /**
+//     * 9.
+//     */
     @Test
     public void shouldReturnHowMuchAccountHaveUsers() {
         final long accountAmount = workShop.getAllUserAccountsAmount();
@@ -116,42 +116,42 @@ public class WorkShopTest {
                 allCompaniesName.toString());
     }
 
-    /**
-     * 11.
-     */
+//    /**
+//     * 11.
+//     */
     @Test
     public void shouldReturnSetOfAllCurrencies() {
         final String allUsedCurrecies = workShop.getAllCurrencies();
         assertEquals("CHF, EUR, PLN, USD", allUsedCurrecies);
     }
 
-    /**
-     * 12.
-     */
+//    /**
+//     * 12.
+//     */
     @Test
     public void shouldReturnSetOfAllCurrenciesUsingGenerate() {
         final String allUsedCurrecies = workShop.getAllCurrenciesUsingGenerate();
         assertEquals("CHF, EUR, PLN, USD", allUsedCurrecies);
     }
-
-    /**
-     * 13.
-     */
+//
+//    /**
+//     * 13.
+//     */
     @Test
     public void shouldReturnHowManyWomenAreInCompanies() {
         final long womanAmount = workShop.getWomanAmount();
         assertEquals(4, womanAmount);
     }
-
+//
     /**
      * 14.
      */
     @Test
     public void shouldCalculateAmountInPln() {
-        final Account accountWithOneZloty = Account.builder()
-                .amount(new BigDecimal("1.0"))
-                .currency(Currency.PLN)
-                .build();
+        Account.AccountBuilder builder = Account.builder();
+        builder.amount(new BigDecimal("1.0"));
+        builder.currency(Currency.PLN);
+        final Account accountWithOneZloty = builder.build();
 
         assertEquals(new BigDecimal("1.00"), workShop.getAccountAmountInPLN(accountWithOneZloty));
 
@@ -162,10 +162,10 @@ public class WorkShopTest {
 
         assertEquals(new BigDecimal("3.720"), workShop.getAccountAmountInPLN(accountWithOneDolar));
     }
-
-    /**
-     * 15.
-     */
+//
+//    /**
+//     * 15.
+//     */
     @Test
     public void shouldGetTotalCashInPLNCorrectlySum() {
         final List<Account> accounts = Arrays.asList(
@@ -176,7 +176,7 @@ public class WorkShopTest {
 
         assertEquals(636, workShop.getTotalCashInPLN(accounts).intValue());
     }
-
+//
     /**
      * 16.
      */
@@ -195,7 +195,7 @@ public class WorkShopTest {
         final List<String> oldWomam = workShop.getOldWoman(50);
         assertEquals("[Karol]", oldWomam.toString());
     }
-
+//
     /**
      * 18.
      */
